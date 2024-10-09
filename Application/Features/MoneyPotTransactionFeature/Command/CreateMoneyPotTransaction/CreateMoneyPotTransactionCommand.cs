@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Application.Features.MoneyPotTransactionFeature.Command.CreateMoneyPotTransaction
 {
-    public class CreateMoneyPotTransactionCommand : MapFrom<CreateMoneyPotTransactionModel>, IRequest<bool>
+    public class CreateMoneyPotTransactionCommand : IRequest<bool>
     {
         public string FullName { get; set; }
         public decimal Amount { get; set; }

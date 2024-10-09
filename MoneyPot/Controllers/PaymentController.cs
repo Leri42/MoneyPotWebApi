@@ -1,5 +1,4 @@
-﻿using Application.Features.MoneyPotFeature.Command.CreateMoneyPot;
-using Application.Features.MoneyPotTransactionFeature.Command.CreateMoneyPotTransaction;
+﻿using Application.Features.MoneyPotTransactionFeature.Command.CreateMoneyPotTransaction;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +19,8 @@ namespace MoneyPot.Controllers
         }
         [HttpPost(template: nameof(CreateMoneyPotTransaction), Name = nameof(CreateMoneyPotTransaction))]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> CreateMoneyPotTransaction([FromBody] CreateMoneyPotTransactionModel model)
+        public async Task<IActionResult> CreateMoneyPotTransaction([FromBody] CreateMoneyPotTransactionCommand command)
         {
-            var command = _mapper.Map<CreateMoneyPotTransactionCommand>(model);
 
             var result = await _mediator.Send(command);
 

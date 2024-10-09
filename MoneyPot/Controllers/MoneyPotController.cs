@@ -1,6 +1,7 @@
 ﻿using Application.Features.MoneyPotFeature.Command.CreateMoneyPot;
 using Application.Features.MoneyPotFeature.Query.GetApplicationUsersMoneyPots;
 using Application.Features.MoneyPotFeature.Query.GetMoneyPot;
+using Application.Features.MoneyPotFeature.Query.GetMoneyPotTransactions;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -10,8 +11,8 @@ using System.Security.Claims;
 namespace MoneyPot.Controllers
 {
     //[Authorize]
+    [Route("api/MoneyPot")]
     [ApiController]
-    [Route("api/[controller]")]
     public class MoneyPotController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -28,36 +29,52 @@ namespace MoneyPot.Controllers
 
         [HttpPost(template: nameof(CreateMoneyPot), Name = nameof(CreateMoneyPot))]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> CreateMoneyPot([FromBody] CreateMoneyPotModel model)
+        public async Task<IActionResult> CreateMoneyPot([FromBody] CreateMoneyPotCommand command)
         {
 
             //var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            model.CreatorId = 1;
+            command.CreatorId = 1;
 
-            var command = _mapper.Map<CreateMoneyPotCommand>(model);
+           
 
             var result = await _mediator.Send(command);
 
             return Ok(result); 
         }
 
-        [HttpGet("{id}", Name = nameof(GetMoneyPotLink))]
-        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetMoneyPotLink([FromQuery] GetMoneyPotLinkModel model) {
-            var query = _mapper.Map<GetMoneyPotLinkQuery>(model);
+        [HttpGet("{id}/link", Name = "GetMoneyPotLink")]
+        [ProducesResponseType(typeof(MoneyPotModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMoneyPotLink(long id)
+        {
+            var query = new GetMoneyPotLinkQuery { Id = id }; 
             var result = await _mediator.Send(query);
 
             return Ok(result);
         }
 
-        [HttpGet("{ApplicationUserId}", Name = nameof(GetApplicationUsersMoneyPots))]
+        [HttpGet("user-pots", Name = "GetApplicationUsersMoneyPots")] 
         [ProducesResponseType(typeof(IEnumerable<ApplicationUsersMoneyPotsModel>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetApplicationUsersMoneyPots([FromQuery] GetApplicationUsersMoneyPotsModel model)
+        public async Task<IActionResult> GetApplicationUsersMoneyPots()
         {
             var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            model.ApplicationUserId = creatorId;
-            var query = _mapper.Map<GetApplicationUsersMoneyPotsQuery>(model);
+
+            var query = new GetApplicationUsersMoneyPotsQuery { ApplicationUserId = 1 };
             var result = await _mediator.Send(query);
+
+            return Ok(result);
+        }
+
+        [HttpGet("{id}/transactions", Name = "GetMoneyPotWithTransactions")] // Named route
+        [ProducesResponseType(typeof(MoneyPotModel), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMoneyPotWithTransactions(int id)
+        {
+            var query = new GetMoneyPotTransactionsQuery { Id = id};
+            var result = await _mediator.Send(query);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
 
             return Ok(result);
         }

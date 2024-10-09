@@ -19,9 +19,25 @@ namespace Application.Features.MoneyPotFeature.Query.GetApplicationUsersMoneyPot
         {
             var moneyPots= await _unitOfWork.MoneyPots.ApplicationUserMoneyPots(request.ApplicationUserId);
 
-            var result = _mapper.Map<IEnumerable<ApplicationUsersMoneyPotsModel>>(moneyPots);
+            var moneyPotModels = new List<ApplicationUsersMoneyPotsModel>();
 
-            return result;
+            foreach (var moneyPot in moneyPots)
+            {
+                var model = new ApplicationUsersMoneyPotsModel
+                {
+                    Title = moneyPot.Title,
+                    Description = moneyPot.Description,
+                    UniqueLink = moneyPot.UniqueLink,
+                    TargetAmount = moneyPot.TargetAmount,
+                    Deadline = moneyPot.Deadline,
+                    CurrentAmount = moneyPot.CurrentAmount,
+                    IsActive = moneyPot.IsActive
+                };
+
+                moneyPotModels.Add(model);
+            }
+
+            return moneyPotModels;
 
         }
     }

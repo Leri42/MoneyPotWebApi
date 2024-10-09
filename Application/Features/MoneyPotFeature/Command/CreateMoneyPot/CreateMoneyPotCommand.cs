@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Application.Features.MoneyPotFeature.Command.CreateMoneyPot
 {
-    public class CreateMoneyPotCommand :MapFrom<CreateMoneyPotModel>, IRequest<string>
+    public class CreateMoneyPotCommand : IRequest<string>
     {
         public string Title { get; set; }
         public string Description { get; set; }
