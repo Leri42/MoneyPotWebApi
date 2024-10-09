@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Aggregates.ApplcationUserAggregate
 {
-    public class ApplicationUser:IdentityUser
+    public class ApplicationUser:IdentityUser<int>
     {
-        public decimal Balance { get; set; }
     }
 }

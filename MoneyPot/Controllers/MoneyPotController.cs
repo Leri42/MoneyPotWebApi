@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace MoneyPot.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class MoneyPotController : ControllerBase
@@ -31,14 +31,14 @@ namespace MoneyPot.Controllers
         public async Task<IActionResult> CreateMoneyPot([FromBody] CreateMoneyPotModel model)
         {
 
-            var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            model.CreatorId = creatorId;
+            //var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            model.CreatorId = 1;
 
             var command = _mapper.Map<CreateMoneyPotCommand>(model);
 
             var result = await _mediator.Send(command);
 
-            return CreatedAtAction(nameof(CreateMoneyPot), new { id = result }, command);
+            return Ok(result); 
         }
 
         [HttpGet("{id}", Name = nameof(GetMoneyPotLink))]

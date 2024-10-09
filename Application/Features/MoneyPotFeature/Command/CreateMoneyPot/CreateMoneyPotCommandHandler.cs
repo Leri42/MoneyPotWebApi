@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Features.MoneyPotFeature.Command.CreateMoneyPot
 {
-    public class CreateMoneyPotCommandHandler : IRequestHandler<CreateMoneyPotCommand, long>
+    public class CreateMoneyPotCommandHandler : IRequestHandler<CreateMoneyPotCommand, string>
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -13,7 +13,7 @@ namespace Application.Features.MoneyPotFeature.Command.CreateMoneyPot
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<long> Handle(CreateMoneyPotCommand request, CancellationToken cancellationToken)
+        public async Task<string> Handle(CreateMoneyPotCommand request, CancellationToken cancellationToken)
         {
             var moneyPot = MoneyPot.Create(
            request.Title,
@@ -23,10 +23,12 @@ namespace Application.Features.MoneyPotFeature.Command.CreateMoneyPot
            request.Deadline,
            request.CreatorId);
 
-            await _unitOfWork.MoneyPots.AddAsync(moneyPot);
-           var result = await _unitOfWork.SaveChangesAsync(cancellationToken);
+            moneyPot.GenerateUniqueLink();
 
-            return result;
+            await _unitOfWork.MoneyPots.AddAsync(moneyPot);
+           await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return moneyPot.UniqueLink;
 
         }
     }

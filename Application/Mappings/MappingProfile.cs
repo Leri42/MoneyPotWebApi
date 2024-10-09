@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Application.Mappings;
+using AutoMapper;
 using System.Reflection;
 
 public class MappingProfile : Profile
@@ -38,12 +39,5 @@ public class MappingProfile : Profile
     }
 }
 
-public class MapFrom<T> : IMapFrom<T>
-{
-    public void Mapping(Profile profile) => profile.CreateMap(typeof(T), GetType());
-}
 
-public interface IMapFrom<T>
-{
-    void Mapping(Profile profile);
-}
+

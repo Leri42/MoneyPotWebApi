@@ -6,5 +6,6 @@ namespace Domain.Aggregates.MoneyPotAggregate
     {
         Task<string> MoneyPotLink(long id);
         Task<IQueryable<MoneyPot>> ApplicationUserMoneyPots(long ApplicationUserId);
+        Task<MoneyPot> MoneyPotByLink(string uniqueLink);
     }
 }

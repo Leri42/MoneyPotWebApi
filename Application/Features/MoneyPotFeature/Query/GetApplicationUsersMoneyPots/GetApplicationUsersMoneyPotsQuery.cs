@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Application.Mappings;
+using MediatR;
 
 namespace Application.Features.MoneyPotFeature.Query.GetApplicationUsersMoneyPots
 {

@@ -1,7 +1,7 @@
 ﻿using Domain.Aggregates.TransactionAggregate;
 using Infrastructure.Data;
 
-namespace Infrastructure.Services
+namespace Infrastructure.Repositories
 {
     public class MoneyPotTransactionRepository : GenericRepository<MoneyPotTransaction>, IMoneyPotTransactionRepository
     {

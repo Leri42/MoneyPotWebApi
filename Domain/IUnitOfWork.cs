@@ -12,5 +12,6 @@ namespace Domain
         IApplicationUserRepository ApplicationUsers { get; }
 
         Task<long> SaveChangesAsync(CancellationToken cancellationToken);
+        Task<bool> CompleteAsync();
     }
 }
