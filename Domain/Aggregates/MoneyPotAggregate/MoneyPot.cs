@@ -1,5 +1,6 @@
 ﻿using Domain.Aggregates.ApplcationUserAggregate;
 using Domain.Aggregates.TransactionAggregate;
+using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -21,13 +22,12 @@ namespace Domain.Aggregates.MoneyPotAggregate
         public bool IsActive { get; set; }
         public List<MoneyPotTransaction> Transactions { get; set; }
 
-        public static MoneyPot Create(string title, string description, string uniqueLink, decimal targetAmount, string deadline, int creatorId)
+        public static MoneyPot Create(string title, string description,  decimal targetAmount, string deadline, int creatorId)
         {
             return new MoneyPot
             {
                 Title = title,
                 Description = description,
-                UniqueLink = uniqueLink,
                 TargetAmount = targetAmount,
                 Deadline = deadline,
                 ApplciationUserId = creatorId,
@@ -38,8 +38,22 @@ namespace Domain.Aggregates.MoneyPotAggregate
         }
         public void GenerateUniqueLink()
         {
-           
-            UniqueLink = $"https://yourdomain.com/moneypot/{Id}";
+
+            UniqueLink = LinkGenerator.GenerateMoneyPotLink(Id);
+        }
+
+
+    }
+    public static class LinkGenerator
+    {
+        public static string GenerateMoneyPotLink(long moneyPotId)
+        {
+            // Replace this with your actual domain or dynamically retrieve it from configuration
+            string baseUrl = "https://localhost:44331";  // Assuming you're using localhost for development
+            string moneyPotPath = $"/api/MoneyPot/{moneyPotId}";
+
+            // Combine the base URL and the MoneyPot path
+            return $"{baseUrl}{moneyPotPath}";
         }
     }
 }

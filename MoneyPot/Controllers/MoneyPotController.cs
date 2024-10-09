@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace MoneyPot.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/MoneyPot")]
     [ApiController]
     public class MoneyPotController : ControllerBase
@@ -32,8 +32,8 @@ namespace MoneyPot.Controllers
         public async Task<IActionResult> CreateMoneyPot([FromBody] CreateMoneyPotCommand command)
         {
 
-            //var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            command.CreatorId = 1;
+            var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            command.CreatorId = creatorId;
 
            
 

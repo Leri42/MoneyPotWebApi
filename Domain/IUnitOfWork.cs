@@ -13,5 +13,8 @@ namespace Domain
 
         Task<long> SaveChangesAsync(CancellationToken cancellationToken);
         Task<bool> CompleteAsync();
+        Task BeginTransactionAsync();
+        Task RollbackTransactionAsync();
+        Task CommitTransactionAsync();
     }
 }

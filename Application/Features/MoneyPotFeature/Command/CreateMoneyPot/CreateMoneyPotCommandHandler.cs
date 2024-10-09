@@ -15,10 +15,19 @@ namespace Application.Features.MoneyPotFeature.Command.CreateMoneyPot
 
         public async Task<string> Handle(CreateMoneyPotCommand request, CancellationToken cancellationToken)
         {
+            if (request.TargetAmount <= 0)
+            {
+                throw new Exception("The amount is belove Zero");
+            }
+
+            if(DateTime.Parse(request.Deadline) <= DateTime.UtcNow)
+            {
+                throw new Exception("Invalid Date");
+            }
+
             var moneyPot = MoneyPot.Create(
            request.Title,
            request.Description,
-           request.UniqueLink,
            request.TargetAmount,
            request.Deadline,
            request.CreatorId);
@@ -26,7 +35,10 @@ namespace Application.Features.MoneyPotFeature.Command.CreateMoneyPot
             moneyPot.GenerateUniqueLink();
 
             await _unitOfWork.MoneyPots.AddAsync(moneyPot);
-           await _unitOfWork.SaveChangesAsync(cancellationToken);
+            var id = moneyPot.Id;
+
+            moneyPot.GenerateUniqueLink();
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return moneyPot.UniqueLink;
 
