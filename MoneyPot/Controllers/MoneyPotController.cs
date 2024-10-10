@@ -64,7 +64,8 @@ namespace MoneyPot.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}/transactions", Name = "GetMoneyPotWithTransactions")] // Named route
+        [HttpGet("{id}/transactions", Name = "GetMoneyPotWithTransactions")]
+        [AllowAnonymous]    
         [ProducesResponseType(typeof(MoneyPotModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetMoneyPotWithTransactions(int id)
         {

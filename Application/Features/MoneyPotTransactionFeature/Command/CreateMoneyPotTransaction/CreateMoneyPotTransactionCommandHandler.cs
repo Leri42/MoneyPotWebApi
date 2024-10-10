@@ -1,7 +1,9 @@
-﻿using Domain;
+﻿using Application.Service;
+using Domain;
 using Domain.Aggregates.TransactionAggregate;
 using Domain.Services;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Features.MoneyPotTransactionFeature.Command.CreateMoneyPotTransaction
 {
@@ -9,11 +11,13 @@ namespace Application.Features.MoneyPotTransactionFeature.Command.CreateMoneyPot
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPaymentService _paymentService;
+        private readonly ILogger<MoneyPotService> _logger;
 
-        public CreateMoneyPotTransactionCommandHandler(IUnitOfWork unitOfWork, IPaymentService paymentService)
+        public CreateMoneyPotTransactionCommandHandler(IUnitOfWork unitOfWork, IPaymentService paymentService, ILogger<MoneyPotService> logger)
         {
             _unitOfWork = unitOfWork;
             _paymentService = paymentService;
+            _logger = logger;
         }
 
         public async Task<bool> Handle(CreateMoneyPotTransactionCommand request, CancellationToken cancellationToken)
@@ -26,6 +30,7 @@ namespace Application.Features.MoneyPotTransactionFeature.Command.CreateMoneyPot
                 if (!paymentSuccess)
                 {
                     await _unitOfWork.RollbackTransactionAsync();
+                    _logger.LogInformation($"Unuccessfull Payment {request.CardNumber}, {request.Amount}");
                     return false; 
                 }
 
@@ -38,15 +43,21 @@ namespace Application.Features.MoneyPotTransactionFeature.Command.CreateMoneyPot
                 if (moneyPot.CurrentAmount >= moneyPot.TargetAmount || DateTime.Parse(moneyPot.Deadline) <= DateTime.UtcNow)
                 {
                     moneyPot.IsActive = false;
+                    _logger.LogInformation($"Unuccessfull Transaction {moneyPot.Id} {moneyPot.IsActive}");
                 }
+
+                _logger.LogInformation($"Successfull Transaction{moneyPot.Id}, {request.Amount} {request.CardNumber}");
+
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 await _unitOfWork.CommitTransactionAsync();
                 return true;
             }
-            catch
+            catch (Exception ex) 
             {
                 await _unitOfWork.RollbackTransactionAsync();
+                _logger.LogError(ex, "An error occurred while makeing transaction");
+                
                 throw; 
             }
 

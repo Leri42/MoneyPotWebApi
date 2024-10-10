@@ -12,7 +12,7 @@ namespace Domain.Aggregates.MoneyPotAggregate
         public long Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public string UniqueLink { get; set; }
+        public string? UniqueLink { get; set; }
         public decimal TargetAmount { get; set; }
         public string Deadline { get; set; }
         public decimal CurrentAmount { get; set; }

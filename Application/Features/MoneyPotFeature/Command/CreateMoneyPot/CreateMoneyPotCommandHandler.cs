@@ -32,10 +32,7 @@ namespace Application.Features.MoneyPotFeature.Command.CreateMoneyPot
            request.Deadline,
            request.CreatorId);
 
-            moneyPot.GenerateUniqueLink();
-
             await _unitOfWork.MoneyPots.AddAsync(moneyPot);
-            var id = moneyPot.Id;
 
             moneyPot.GenerateUniqueLink();
             await _unitOfWork.SaveChangesAsync(cancellationToken);
