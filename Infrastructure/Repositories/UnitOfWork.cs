@@ -3,15 +3,15 @@ using Domain.Aggregates.ApplcationUserAggregate;
 using Domain.Aggregates.MoneyPotAggregate;
 using Domain.Aggregates.TransactionAggregate;
 using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Infrastructure.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly ApplicationDbContext _context; 
+        private readonly ApplicationDbContext _context;
         private IDbContextTransaction _transaction;
+
         public IMoneyPotRepository MoneyPots { get; }
 
         public IMoneyPotTransactionRepository MoneyPotTransactions { get; }
@@ -19,19 +19,17 @@ namespace Infrastructure.Repositories
         public IApplicationUserRepository ApplicationUsers { get; }
 
 
-        public UnitOfWork(ApplicationDbContext context, IMoneyPotRepository moneyPots, IMoneyPotTransactionRepository transactions, IApplicationUserRepository applicationUsers, IDbContextTransaction transaction)
+        public UnitOfWork(ApplicationDbContext context, IMoneyPotRepository moneyPots, IMoneyPotTransactionRepository transactions, IApplicationUserRepository applicationUsers)
         {
             _context = context;
             MoneyPots = moneyPots;
             MoneyPotTransactions = transactions;
             ApplicationUsers = applicationUsers;
-            _transaction = transaction;
         }
 
         public void Dispose()
         {
             _context.Dispose();
-            _transaction?.Dispose();
         }
 
         public async Task<long> SaveChangesAsync(CancellationToken cancellationToken)
@@ -42,14 +40,9 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> CompleteAsync()
         {
-            await _context.SaveChangesAsync();
 
-            if (_transaction != null)
-            {
-                await _transaction.CommitAsync();
-                return true;
-            }
-            return false;
+
+            return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task BeginTransactionAsync()
@@ -57,18 +50,41 @@ namespace Infrastructure.Repositories
             _transaction = await _context.Database.BeginTransactionAsync();
         }
 
+        public async Task CommitTransactionAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.CommitAsync();
+                await _transaction.DisposeAsync();
+            }
+        }
+
         public async Task RollbackTransactionAsync()
         {
             if (_transaction != null)
             {
                 await _transaction.RollbackAsync();
+                await _transaction.DisposeAsync();
             }
         }
 
-        public async Task CommitTransactionAsync()
-        {
-            await _transaction.CommitAsync();
-            _transaction.Dispose();
-        }
+        //public async Task BeginTransactionAsync()
+        //{
+        //    _transaction = await _context.Database.BeginTransactionAsync();
+        //}
+
+        //public async Task RollbackTransactionAsync()
+        //{
+        //    if (_transaction != null)
+        //    {
+        //        await _transaction.RollbackAsync();
+        //    }
+        //}
+
+        //public async Task CommitTransactionAsync()
+        //{
+        //    await _transaction.CommitAsync();
+        //    _transaction.Dispose();
+        //}
     }
 }

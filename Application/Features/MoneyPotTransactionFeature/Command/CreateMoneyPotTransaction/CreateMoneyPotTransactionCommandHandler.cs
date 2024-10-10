@@ -19,11 +19,13 @@ namespace Application.Features.MoneyPotTransactionFeature.Command.CreateMoneyPot
         public async Task<bool> Handle(CreateMoneyPotTransactionCommand request, CancellationToken cancellationToken)
         {
             await _unitOfWork.BeginTransactionAsync();
+
             try
             {
                 var paymentSuccess = await _paymentService.ProcessPayment(request.CardNumber, request.Amount);
                 if (!paymentSuccess)
                 {
+                    await _unitOfWork.RollbackTransactionAsync();
                     return false; 
                 }
 
@@ -37,9 +39,9 @@ namespace Application.Features.MoneyPotTransactionFeature.Command.CreateMoneyPot
                 {
                     moneyPot.IsActive = false;
                 }
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                await _unitOfWork.CompleteAsync();
-                await _unitOfWork.CommitTransactionAsync(); 
+                await _unitOfWork.CommitTransactionAsync();
                 return true;
             }
             catch

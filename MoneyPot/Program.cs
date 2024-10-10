@@ -4,6 +4,7 @@ using Domain.Aggregates.ApplcationUserAggregate;
 using Domain.Aggregates.MoneyPotAggregate;
 using Domain.Aggregates.TransactionAggregate;
 using Domain.Services;
+using Hangfire;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
@@ -14,6 +15,12 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.AddEventSourceLogger();
 
 // Add services to the container.
 builder.Services.AddAuthorization();
@@ -36,7 +43,19 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<IPaymentService, FakePaymentService>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
+
 builder.Services.AddControllers();
+
+
+
+builder.Services.AddHangfire(configuration => configuration
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -64,7 +83,9 @@ builder.Services.AddSwaggerGen(c =>
     c.OperationFilter<AuthorizeCheckOperationFilter>();
 });
 
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -80,6 +101,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapIdentityApi<ApplicationUser>();
+
+
+
+
 app.Run();
 
 
